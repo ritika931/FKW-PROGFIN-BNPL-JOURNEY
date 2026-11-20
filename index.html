@@ -361,7 +361,7 @@ const bat='<svg width="25" height="12" viewBox="0 0 25 12" aria-hidden="true"><r
 /* ---------------- state ---------------- */
 function fresh(){ return {
   screen:'landing', hist:[], sheet:null, toast:null, loading:null, faqClosed:{},
-  f:{mobile:'9876543210', pan:'', entity:'PROPRIETORSHIP', tnc:false},
+  f:{mobile:'', pan:'', entity:'PROPRIETORSHIP', tnc:false},
   panErr:'', panTries:0,
   otp:'', otpErr:'', otpAttempts:3, otpResends:3, timer:0,
   consent:false, e140:0, banner:false, cmob:'', cmobErr:'', cmobTries:0, cotp:'', cotpErr:'', cAttempts:3, cResends:3,
@@ -471,7 +471,7 @@ landing:{n:'Progfin landing (Apply Now)', noHdr:true, r:()=>`
    <div class="ben grn rev"><span class="excl">EXCLUSIVE</span><div class="bil">${ILL.box}</div><div class="bt"><b>Stock deeper,<br>keep your cash</b><span>Buy the stock now, sell it, and settle from what you earn.</span></div></div>
    <h3 class="faqh">We have answers!</h3>
    <div class="faq">${FAQ.map((q,i)=>`<div class="fq"><button type="button" class="fqq" data-a="faq" data-i="${i}" aria-expanded="${!S.faqClosed[i]}">${q[0]}<span aria-hidden="true">${S.faqClosed[i]?'+':'−'}</span></button>${S.faqClosed[i]?'':`<div class="fqa">${q[1]}</div>`}</div>`).join('')}</div>
-   ${devbox('Before this screen',[['→','FKW calls the HF handshake API and redirects here with the customer mobile (outside Progfin APIs).'],['·','Optional: T.1 Save Application Metadata before Onboard.'],['·','Setup: T.2 List Event Types (cache keys).']])}
+   ${devbox('Before this screen',[['→','FKW calls the HF handshake API and redirects here (outside Progfin APIs). The handshake does not include the mobile number; the customer enters it on the next screen.'],['·','Optional: T.1 Save Application Metadata before Onboard.'],['·','Setup: T.2 List Event Types (cache keys).']])}
   </div>
  </div>
  <div class="sticky"><p class="steps3"><span aria-hidden="true">⚡</span> Get Instant Credit in <b>3</b> easy steps!</p><button type="button" class="cta" data-a="apply">Apply Now</button></div>`},
@@ -479,7 +479,7 @@ landing:{n:'Progfin landing (Apply Now)', noHdr:true, r:()=>`
 onboard:{n:'Mobile, PAN, entity type', r:()=>`
  <div class="bd">
   ${head(I.id(),'Let’s get started','We need a few details to check your eligibility.')}
-  ${field('mobile','Mobile number',S.f.mobile,{k:'f.mobile',mode:'numeric',max:10,src:'from FKW handshake'})}
+  ${field('mobile','Mobile number',S.f.mobile,{k:'f.mobile',mode:'numeric',max:10,ph:'10-digit mobile number'})}
   ${field('pan',"Applicant's PAN number",S.f.pan,{k:'f.pan',ph:'ABCDE1234F',max:10,err:!!S.panErr,help:S.panErr})}
   ${field('entity','Entity type',S.f.entity,{k:'f.entity',options:[['PROPRIETORSHIP','Proprietorship'],['PARTNERSHIP','Partnership'],['PRIVATE_LIMITED','Private Limited'],['PUBLIC_LIMITED','Public Limited'],['LLP','LLP'],['HUF','HUF']]})}
   ${fillBtn('fillOnboard')}
@@ -827,7 +827,7 @@ const A = {
  restart(){ restart(); },
  apply(){ section('Onboarding'); go('onboard'); },
  faq(btn){ const i=btn.getAttribute('data-i'); S.faqClosed[i]=!S.faqClosed[i]; render(); },
- fillOnboard(){ S.f.pan='ABCPS1234D'; S.f.tnc=true; render(); },
+ fillOnboard(){ S.f.mobile='9876543210'; S.f.pan='ABCPS1234D'; S.f.tnc=true; render(); },
  onboard(){
   const body = JSON.stringify({business_type:S.f.entity, external_identifier:'FK-EXT-0001', pan:S.f.pan, mobile:S.f.mobile, gstin:'29ABCPS1234D1Z5'});
   bg({title:'Checking your details', step:0, calls:[{label:'POST /onboard/ · 0.1 Onboard (PAN verified automatically)'}], then:()=>{
@@ -1071,7 +1071,7 @@ const JUMPS = [
  ['KFS','approved',()=>{ base(); A.fillBank(); S.limit={limit:200000,score:770,lan:'HHPL/12345/2026-2027'}; }],
  ['Agreement','agreement',()=>{ base(); A.fillBank(); S.limit={limit:200000,score:770,lan:'HHPL/12345/2026-2027'}; }],
 ];
-function base(){ S.f.pan='ABCPS1234D'; S.f.tnc=true; S.applicant={id:678}; S.bank.holder='PRIYA SHARMA'; S.biz.gstin='29ABCPS1234D1Z5'; }
+function base(){ S.f.mobile='9876543210'; S.f.pan='ABCPS1234D'; S.f.tnc=true; S.applicant={id:678}; S.bank.holder='PRIYA SHARMA'; S.biz.gstin='29ABCPS1234D1Z5'; }
 document.getElementById('jump').innerHTML = JUMPS.map((j,i)=>`<button type="button" class="btn" data-j="${i}">${j[0]}</button>`).join('');
 document.getElementById('jump').addEventListener('click', e => { const b=e.target.closest('[data-j]'); if(!b) return; const j=JUMPS[+b.dataset.j]; clearInterval(timerId); S=fresh(); S.f.entity=SC.entity; j[2](); section('Jumped to: '+j[0]+' (earlier steps assumed done)'); S.screen=j[1]; render(); });
 
